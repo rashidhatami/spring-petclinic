@@ -1,17 +1,18 @@
 pipeline {
-    agent {docker 'maven:3.5-alpine'}
+    agent { label 'linux' }
     
     stages {
      
-        stage('Checkout') { 
-            steps {
-                git 'https://github.com/rashidhatami/spring-petclinic.git' 
-            }
+        stage ('Checkout') {
+          steps {
+            git 'https://github.com/rashidhatami/spring-petclinic.git'
+          }
         }
-	stage('Build') { 
-		    steps {
-		        sh 'mvn clean package'
-			junit '**/targer/surefire-report/TEST-*.xml' 
+        stage('Build') {
+            agent { docker 'maven:3.5-alpine' }
+            steps {
+                sh 'mvn clean package'
+                junit '**/target/surefire-reports/TEST-*.xml' 
 		    }
 		}
     }
