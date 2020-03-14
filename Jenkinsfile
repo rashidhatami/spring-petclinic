@@ -13,9 +13,9 @@ pipeline {
             agent { docker 'maven:latest' }
             steps {
                 sh 'mvn clean package'
-               // junit '**/target/surefire-reports/TEST-*.xml' 
+                junit '**/target/surefire-reports/TEST-*.xml' 
 		    }
-	}
+        }
 
     }
 }
