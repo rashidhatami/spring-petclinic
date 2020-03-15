@@ -1,31 +1,26 @@
 pipeline {
-   // 
-   agent any
-    
+    agent { label 'linux' }
     stages {
-     
         stage ('Checkout') {
           steps {
-                git 'https://github.com/rashidhatami/spring-petclinic.git'
-                 }
+            git 'https://github.com/rashidhatami/spring-petclinic.git'
+          }
         }
         stage('Build') {
-            agent { docker 'maven:latest' }
+            agent { docker 'maven:3.5-alpine' }
             steps {
                 sh 'mvn clean package'
                 junit '**/target/surefire-reports/TEST-*.xml'
-                archiveArtifacts artifacts:'target/*.jar', fingerprint:true
-		    }
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
         }
-            stage('Deploy') {
-            steps {
-                input 'Do you approve the deployment?'
-                    sh 'scp target/*.jar jenkins@172.17.0.3:/opt/pet'
-                  
-               
-		    }
+        stage('Deploy') {
+          steps {
+            input 'Do you approve the deployment?'
+            sh 'scp target/*.jar jenkins@127.0.0.1:/opt/pet/'
+            sh "ssh jenkins@127.0.0.1 'nohup java -jar /opt/pet/spring-petclinic-1.5.1.jar &'"
+          }
         }
-
     }
 }
 
